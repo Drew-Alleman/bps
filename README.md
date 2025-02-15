@@ -36,12 +36,23 @@ Scan took 5.85774 seconds.
 ## Scanning Multiple Targets
 You can seperate targets with comma. 
 ```
-$ bps.exe -t 127.0.0.1,192.168.0.1 -F
+$ bps.exe -t 127.0.0.1,192.168.0.1,192.168.0.132,192.168.0.121,192.168.0.5 -F
+Target: 192.168.0.121
+No open ports found.
+
+Target: 192.168.0.132
+Open Ports:
+135/tcp
+139/tcp
+445/tcp
+902/tcp
+912/tcp
+
 Target: 127.0.0.1
 Open Ports:
 135/tcp
-445/tcp
 902/tcp
+445/tcp
 912/tcp
 
 Target: 192.168.0.1
@@ -50,7 +61,10 @@ Open Ports:
 80/tcp
 443/tcp
 
-Scan took 3.06422 seconds.
+Target: 192.168.0.5
+No open ports found.
+
+Scan took 3.28129 seconds.
 ```
 
 ## Scanning a Custom Port Range
