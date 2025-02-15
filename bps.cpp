@@ -12,15 +12,15 @@ int main(int argc, char** argv)
     bool isFastMode;
     int timeout;
 
-    po::options_description desc("Allowed options");
+    po::options_description desc("bps (https://github.com/Drew-Alleman/bps)");
 
     desc.add_options()
         ("help,h", "Displays this help message.")
-        ("target,t", po::value<std::string>(&targetString)->required(), "Target IPV4 Address to scan")
-        ("fast,F", po::bool_switch(&isFastMode)->default_value(false), "Only scans the top 1024 ports")
-        ("start,s", po::value<int>(&startPort)->default_value(1), "Specify a starting port number")
-        ("end,e", po::value<int>(&endPort)->default_value(65535), "Specify a ending port number")
-        ("timeout,w", po::value<int>(&timeout)->default_value(3), "The amount of seconds to wait before determining a port is closed.");
+        ("target,t", po::value<std::string>(&targetString)->required(), "Specify one or more target IPv4 addresses to scan (comma-separated list).")
+        ("fast,F", po::bool_switch(&isFastMode)->default_value(false), "Enable fast scan mode: only scan the top 1024 most common ports.")
+        ("start,s", po::value<int>(&startPort)->default_value(1), "Set the starting port number for the scan (default: 1).")
+        ("end,e", po::value<int>(&endPort)->default_value(65535), "Set the ending port number for the scan (default: 65535).")
+        ("timeout,w", po::value<int>(&timeout)->default_value(3), "Define the timeout (in seconds) for each port scan attempt (default: 3 seconds).");
 
     po::variables_map vm;
 
