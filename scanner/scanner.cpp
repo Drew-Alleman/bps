@@ -145,7 +145,6 @@ void Scanner::start() {
     loadTargets();
     Scanner::scan();
     displayResults();
-    std::cout << std::thread::hardware_concurrency() << std::endl;
     double elapsedTime = getElapsed().count();
     std::cout << "Scan took " << elapsedTime << " seconds.\n";
 }
