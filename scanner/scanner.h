@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cctype>    
 #include <thread>
+#include <semaphore>
 
 using namespace boost::asio;
 
@@ -50,4 +51,7 @@ public:
     void displayResults();
     // Calculates the amount of time the program has been running for
     std::chrono::duration<double> getElapsed();
+
+private:
+    std::counting_semaphore<10000> semaphore{ 10000 };
 };

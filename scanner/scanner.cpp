@@ -50,6 +50,7 @@ void Scanner::isOpen(boost::asio::ip::address target, int port) {
     * @param[in] target Boost asio IPV4 Address
     * @param[in] port   The port to connect to
     */
+    semaphore.acquire();
     auto socket = std::make_shared<boost::asio::ip::tcp::socket>(ctx);
     auto timer = std::make_shared<boost::asio::steady_timer>(ctx);
     boost::asio::ip::tcp::endpoint endpoint(target, port);
@@ -67,6 +68,7 @@ void Scanner::isOpen(boost::asio::ip::address target, int port) {
             }
             socket->close();
         }
+        semaphore.release();
         });
 
     timer->async_wait([socket](const boost::system::error_code& ec) {
@@ -83,11 +85,12 @@ void Scanner::displayResults() {
     * for each loaded target
     */
     for (const auto& [ip, ports] : scanResults) {
+        std::cout << "Target: " << ip << "\n";
         if (ports.empty()) {
-            continue;
+            std::cout << "No open ports found.\n\n";
         }
         else {
-            std::cout << "Target: " << ip << "\nOpen Ports: \n";
+            std::cout << "Open Ports: \n";
             for (int port : ports) {
                 std::cout << port << "/tcp \n";
             }
@@ -142,6 +145,7 @@ void Scanner::start() {
     loadTargets();
     Scanner::scan();
     displayResults();
+    std::cout << std::thread::hardware_concurrency() << std::endl;
     double elapsedTime = getElapsed().count();
     std::cout << "Scan took " << elapsedTime << " seconds.\n";
 }
