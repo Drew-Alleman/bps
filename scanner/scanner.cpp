@@ -1,4 +1,32 @@
 #include "scanner.h"
+#include <boost/optional.hpp>
+
+boost::optional<boost::asio::ip::address> resolveDomain(const std::string& domain) {
+    /*
+    * @breif Takes an input string and attempts to resolve it as a domain to a ipv4 address
+    *
+    * Uses `entry.endpoint().address()` to grab the first valid IPV4 address
+    * 
+    * @param[in] domain the string to attempt to parse as a domain name (e.g: google.com)
+    * 
+    * @return a boost asio ip address or None
+    */
+    boost::asio::io_context io_context;
+    boost::asio::ip::tcp::resolver resolver(io_context);
+    boost::system::error_code ec;
+
+    // Resolve the domain name.
+    auto endpoints = resolver.resolve(domain, "", ec);
+    if (!ec) {
+        for (const auto& entry : endpoints) {
+            auto addr = entry.endpoint().address();
+            if (addr.is_v4()) {
+                return addr; // Return the first valid IPv4 address.
+            }
+        }
+    }
+    return boost::none;
+}
 
 void Scanner::updateDictionary(const std::string& ip, int port) {
     /**
@@ -33,7 +61,16 @@ void Scanner::loadTargets() {
             mutexMap[ip]; 
         }
         catch (const boost::system::system_error& e) {
-            std::cerr << "Invalid IP address: " << ip << " (" << e.what() << ")\n";
+            auto resolvedAddress = resolveDomain(ip);
+            if (resolvedAddress) {
+                targets.push_back(*resolvedAddress);
+                std::string addrStr = resolvedAddress->to_string();
+                scanResults[addrStr];
+                mutexMap[addrStr];
+            }
+            else {
+                std::cerr << "Invalid IP address or invalid domain: " << ip << " (" << e.what() << ")\n";
+            }
         }
     }
 }
