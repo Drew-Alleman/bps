@@ -8,20 +8,19 @@ int main(int argc, char** argv)
 {
     int startPort = 1;
     int endPort = 65535;
-    std::string target;
+    std::string targetString;
     bool isFastMode;
-    bool isDebugMode;
+    int timeout;
 
     po::options_description desc("Allowed options");
 
     desc.add_options()
         ("help,h", "Displays this help message.")
-        ("target,t", po::value<std::string>(&target)->required(), "Target IPV4 Address to scan")
+        ("target,t", po::value<std::string>(&targetString)->required(), "Target IPV4 Address to scan")
         ("fast,F", po::bool_switch(&isFastMode)->default_value(false), "Only scans the top 1024 ports")
         ("start,s", po::value<int>(&startPort)->default_value(1), "Specify a starting port number")
-        ("end,e", po::value<int>(&endPort)->default_value(65535), "Specify a ending port number");
-    ("debug,d", po::bool_switch(&isDebugMode)->default_value(false), "Enables debug logging");
-
+        ("end,e", po::value<int>(&endPort)->default_value(65535), "Specify a ending port number")
+        ("timeout,w", po::value<int>(&timeout)->default_value(3), "The amount of seconds to wait before determining a port is closed.");
 
     po::variables_map vm;
 
@@ -44,7 +43,6 @@ int main(int argc, char** argv)
     if (isFastMode)
         endPort = 1024;
 
-    Scanner scanner(target, startPort, endPort);
+    Scanner scanner(targetString, startPort, endPort, timeout);
     scanner.start();
-    scanner.displayResults();
 }
