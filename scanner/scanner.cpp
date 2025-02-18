@@ -181,8 +181,7 @@ void Scanner::throttleConnectionIfNeeded(Target target, int port, int retries) {
             logger->debug("[Scanner::isOpen] Throttling connection to {}:{} (activeConnections: {})",
                 target.prettyName, port, activeConnections.load());
         }
-        // add 1 to ensure the old connections have expired
-        auto delayTimer = std::make_shared<boost::asio::steady_timer>(ctx, std::chrono::seconds(timeout + 1));
+        auto delayTimer = std::make_shared<boost::asio::steady_timer>(ctx, std::chrono::seconds(timeout));
         delayTimer->async_wait([this, target, port, retries, delayTimer](const boost::system::error_code& ec) {
             if (!ec) {
                 isOpen(target, port, retries);
@@ -231,6 +230,11 @@ void Scanner::isOpen(Target target, int port, int retries) {
             }
         }
     ));
+    timer->async_wait([socket, completed](const boost::system::error_code& ec) {
+        if (!ec && !completed->load()) {
+            socket->cancel();
+        }
+        });
 }
 
 
@@ -295,8 +299,8 @@ void Scanner::scan() {
      * and waits for all threads to finish before proceeding.
      */
     auto workGuard = boost::asio::make_work_guard(ctx);
-    // gets thread hint divded by 2 with a mininum value of 1
-    unsigned int threadCount = std::max(2u, std::thread::hardware_concurrency()) / 2;
+    // gets thread hint with a mininum value of 1
+    unsigned int threadCount = std::max(1u, std::thread::hardware_concurrency());
     if (logger) {
         logger->debug("[Scanner::scan] Using {} threads to run the ctx context", threadCount);
     }
@@ -375,20 +379,20 @@ void Scanner::loadTimingTemplate() {
 
     // Consistent, and fast results.
     case 3:
-        maxConnections = 2500;
-        timeout = 5;
+        maxConnections = 2000;
+        timeout = 8;
         break;
     case 4:
-        maxConnections = 5000;
-        timeout = 4;
+        maxConnections = 3000;
+        timeout = 3;
         break;
     case 5:
-        maxConnections = 6000;
-        timeout = 3;
+        maxConnections = 4000;
+        timeout = 2;
         break;
     // Racecar, probably will display False positives
     case 6:
-        maxConnections = 8000;
+        maxConnections = 5000;
         timeout = 2;
         break;
     }
