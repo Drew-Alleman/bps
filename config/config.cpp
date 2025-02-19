@@ -55,7 +55,7 @@ Config Config::load(int argc, char** argv) {
         ("verbose,v", po::bool_switch(&config.isVerboseMode)->default_value(false), "Enable verbose logging (provides additional information)")
         ("start,s", po::value<int>(&config.startPort)->default_value(1), "Set the starting port number for the scan (default: 1).")
         ("end,e", po::value<int>(&config.endPort)->default_value(10000), "Set the ending port number for the scan (default: 10000).")
-        ("timing,T", po::value<int>(&config.timing)->default_value(2), "Set timing template from 1-5 (default is 2)")
+        ("timing,T", po::value<int>(&config.timing)->default_value(3), "Set timing template from 0-6 (default is 3)")
         ("closed,C", po::bool_switch(&config.displayClosedPorts)->default_value(false), "Includes the closed ports on a target in the output.");
 
     po::variables_map vm;
